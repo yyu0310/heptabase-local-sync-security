@@ -16,7 +16,7 @@ It started with a simple goal: connect Heptabase to Claude Code so an AI agent c
 
 The official route is Heptabase's own [CLI](https://github.com/heptameta/heptabase-cli-skills), which you turn on in the app under Settings, AI Features, CLI. It is **fail-open**: once you authorize it, the agent can read your entire knowledge base. Third-party tools like the `heptabase-mcp` server work the same way. That is fine if everything in your knowledge base is safe to share. It does not work if you keep confidential cards next to the ones you want an AI to use, which most people do.
 
-The real insight: the privacy wall is not inside Heptabase. It is at the boundary of *what the AI can read*. So the value of a tool like this is not "sync my notes." It is **keep the confidential cards somewhere the AI cannot reach, and export only the rest into AI-readable Markdown.**
+The real insight: the privacy wall has to sit at the boundary of *what the AI can read*. That boundary lives outside Heptabase, in how you feed notes to the agent. So the real job of a tool like this is **to keep the confidential cards somewhere the AI cannot reach, and export only the rest into AI-readable Markdown.** Syncing the notes is the easy half.
 
 That is the sieve. Only the cards you allow pass through.
 
@@ -41,7 +41,7 @@ A card is exported only if it matches one of two explicit allow-lists. Nothing i
 
 The guarantee in one line: every query that touches a card's title or content is constrained to whitelisted whiteboard ids or `card_map` titles. A non-whitelisted card's title and content are never read into memory at all.
 
-Two design principles fall out of this: **structural exclusion beats subtractive exclusion** (a card the query can't reach is safer than a card you filtered out after reading), and **the best notification is the one you never need** (the system is built so there is no "did I leak that card?" question to answer).
+Two design principles fall out of this. **Structural exclusion beats subtractive exclusion**: a card the query can't reach is safer than a card you filtered out after reading. And **the best notification is the one you never need**: the tool is built so you never have to wonder whether a card leaked.
 
 ## How it compares
 
