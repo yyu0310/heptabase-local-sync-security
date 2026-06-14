@@ -4,7 +4,7 @@
 
 由你决定 AI agent 到底能看到哪些卡片，其余一律进不了它的视野。
 
-[English](README.md) · [繁體中文](README.zh-TW.md) · 简体中文 · [日本語](README.ja.md)
+[English](README.md) · [繁體中文](README.zh-TW.md) · 简体中文 · [日本語](README.ja.md) · [한국어](README.ko.md) · [Tiếng Việt](README.vi.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [العربية](README.ar.md) · [עברית](README.he.md) · [Русский](README.ru.md) · [Українська](README.uk.md)
 
 > 非官方工具，与 Heptabase 无任何隶属或背书关系。目前仅支持 macOS。
 

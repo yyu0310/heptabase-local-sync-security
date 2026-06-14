@@ -4,7 +4,7 @@
 
 AI エージェントがどのカードを見られるかを、あなたが正確に決めます。それ以外は一切エージェントの視界に入りません。
 
-[English](README.md) · [繁體中文](README.zh-TW.md) · [简体中文](README.zh-CN.md) · 日本語
+[English](README.md) · [繁體中文](README.zh-TW.md) · [简体中文](README.zh-CN.md) · 日本語 · [한국어](README.ko.md) · [Tiếng Việt](README.vi.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [العربية](README.ar.md) · [עברית](README.he.md) · [Русский](README.ru.md) · [Українська](README.uk.md)
 
 > 非公式ツールです。Heptabase との提携・承認関係はありません。現時点では macOS のみ対応。
 
