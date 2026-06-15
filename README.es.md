@@ -1,4 +1,4 @@
-# HeptaSieve
+# Heptabase Local Sync Security
 
 **Privacidad primero, seguro para IA. Sincronización continua y local de Heptabase a Markdown estructurado.**
 
@@ -16,13 +16,17 @@ Todo comenzó con un objetivo simple: conectar Heptabase a Claude Code para que 
 
 La ruta oficial es el [CLI](https://github.com/heptameta/heptabase-cli-skills) propio de Heptabase, que se activa en la app en Settings, AI Features, CLI. Es **fail-open**: una vez que lo autorizas, el agente puede leer toda tu base de conocimiento. Las herramientas de terceros como el servidor `heptabase-mcp` funcionan igual. Eso está bien si todo lo que tienes en tu base de conocimiento es seguro de compartir. Pero si tienes tarjetas confidenciales junto a las que quieres que use la IA, que es lo que hace la mayoría, esta ruta no funciona.
 
-La clave: el muro de privacidad tiene que estar en el límite de *lo que la IA puede leer*. Ese límite vive fuera de Heptabase, en cómo alimentas tus notas al agente. El trabajo real de una herramienta como esta es **mantener las tarjetas confidenciales fuera del alcance de la IA y exportar solo el resto a Markdown legible por IA.** Sincronizar las notas es la mitad fácil.
+El problema central: el muro de privacidad tiene que estar en el límite de *lo que la IA puede leer*. Ese límite vive fuera de Heptabase, en cómo alimentas tus notas al agente. El trabajo real de una herramienta como esta es **mantener las tarjetas confidenciales fuera del alcance de la IA y exportar solo el resto a Markdown legible por IA.** Sincronizar las notas es la mitad fácil.
 
-Eso es el sieve (tamiz). Solo pasan las tarjetas que tú permites.
+## El nombre
+
+El nombre se divide en tres partes, cada una describe algo distinto. `heptabase` es la fuente de datos, `local-sync` describe el mecanismo, y `security` define el rol.
+
+Security tiene dos significados. El primero es protección: la herramienta se sitúa entre la IA y tu base de conocimiento, usando un mecanismo fail-closed para decidir qué tarjetas entran al campo de visión de la IA y cuáles quedan completamente bloqueadas. No hay filtraciones de datos de qué preocuparse. El segundo se asemeja más a un secretario diligente: organiza silenciosamente tus notas en segundo plano, sincronizando automáticamente cada 15 minutos a donde lo configuraste, para que tus herramientas de IA tengan el contexto listo en el momento en que las abres. Guardar la entrada y manejar el trabajo rutinario. Eso es lo que significa el nombre.
 
 ## Qué hace
 
-HeptaSieve lee directamente tu base de datos local de Heptabase y escribe las tarjetas seleccionadas como archivos Markdown en los destinos que elijas. Un job de `launchd` lo ejecuta cada 15 minutos, manteniendo el Markdown sincronizado con tus notas. El agente de IA solo lee la carpeta de Markdown exportada. Nunca toca la base de datos.
+Heptabase Local Sync Security ejecuta un script Python local que lee directamente tu base de datos de Heptabase y escribe las tarjetas seleccionadas como archivos Markdown en los destinos que elijas. Un job de `launchd` lo ejecuta cada 15 minutos, manteniendo el Markdown sincronizado con tus notas. El agente de IA solo lee la carpeta de Markdown exportada. Nunca toca la base de datos.
 
 - **Lee la base de datos local en vivo.** Heptabase dejó de ofrecer [copias de seguridad locales automáticas](https://support.heptabase.com/en/articles/11064116-how-does-auto-backup-work-in-heptabase) a finales de 2025, por lo que leer la DB en vivo es ahora la ruta confiable para la sincronización continua local.
 - **Conversión fiel a la estructura.** Tablas, listas bullet / todo / toggle, secciones anidadas y videos se obtienen por ingeniería inversa del schema ProseMirror de Heptabase y se renderizan como Markdown limpio.
@@ -39,13 +43,13 @@ Una tarjeta se exporta solo si coincide con una de dos listas de permisos explí
 | **`blacklist_whiteboards`** | Las tarjetas en estos boards se restan *antes* de que se lea cualquier contenido. La blacklist supera a la whitelist, por lo que una tarjeta colocada en dos boards por error sigue siendo bloqueada. |
 | **Sub-whiteboards (sin nombrar)** | Mover una tarjeta a un sub-whiteboard cambia su `whiteboard_id`, por lo que un escaneo de superficie nunca la ve. Excluida por estructura, no por una regla que tengas que recordar. |
 
-La garantía en una línea: cada consulta que toca el título o contenido de una tarjeta está restringida a whiteboard ids en whitelist o títulos de `card_map`. El título y contenido de una tarjeta que no está en whitelist nunca se leen en memoria.
+Más importante aún, cada consulta que toca el título o contenido de una tarjeta está restringida a whiteboard ids en whitelist o títulos de `card_map`. El título y contenido de una tarjeta que no está en whitelist nunca se leen en memoria.
 
-De aquí se derivan dos principios de diseño. **La exclusión estructural supera a la exclusión sustractiva**: una tarjeta a la que la consulta no puede llegar es más segura que una que filtras después de leer. **La mejor notificación es la que nunca necesitas**: la herramienta está diseñada para que nunca tengas que preguntarte si una tarjeta se filtró.
+De aquí se derivan dos principios de diseño. **La exclusión estructural supera a la exclusión sustractiva**: una tarjeta a la que la consulta no puede llegar es más segura que una que filtras después de leer. La herramienta está diseñada para que nunca tengas que preguntarte si una tarjeta se filtró, garantizado por estructura en lugar de por verificación posterior.
 
 ## Cómo se compara
 
-| | HeptaSieve | CLI oficial de Heptabase | Otras herramientas de exportación |
+| | Heptabase Local Sync Security | CLI oficial de Heptabase | Otras herramientas de exportación |
 |---|---|---|---|
 | Modelo de privacidad | Lista de permisos fail-closed | Fail-open (base de conocimiento completa) | Exportación total |
 | Sincronización local continua | Sí (`launchd`, 15 min) | Lectura bajo demanda | Exportación única |
@@ -60,8 +64,8 @@ Esto no es un reemplazo completo de Heptabase, y "mejor que lo oficial" solo se 
 Requisitos: macOS, Python 3.9+, la app desktop de Heptabase instalada.
 
 ```bash
-git clone https://github.com/yyu0310/heptasieve.git
-cd heptasieve
+git clone https://github.com/yyu0310/heptabase-local-sync-security.git
+cd heptabase-local-sync-security
 cp config.example.json config.json
 ```
 
@@ -94,13 +98,21 @@ launchctl load ~/Library/LaunchAgents/com.example.heptasieve.plist
 
 ## Usarlo con un agente de IA
 
-HeptaSieve incluye documentación legible por agentes para que puedas configurarlo hablando con un agente de codificación IA en lugar de seguir pasos manualmente:
+Esta herramienta incluye documentación legible por agentes para que puedas configurarla hablando con un agente de codificación IA en lugar de seguir pasos manualmente:
 
-- [`AGENTS.md`](AGENTS.md) y [`CLAUDE.md`](CLAUDE.md): cómo un agente debe razonar y configurar esta herramienta.
-- [`llms.txt`](llms.txt): un índice de la documentación para LLMs.
-- [`skills/setup-heptasieve/`](skills/setup-heptasieve/): un skill de Claude Code que guía toda la configuración en una sola solicitud.
+- [`AGENTS.md`](AGENTS.md) y [`CLAUDE.md`](CLAUDE.md) le dicen al agente cómo entender y configurar esta herramienta.
+- [`llms.txt`](llms.txt) es un índice de la documentación para LLMs.
+- [`skills/setup-heptasieve/`](skills/setup-heptasieve/) es un skill de Claude Code que guía toda la configuración en una sola solicitud.
 
 Apunta tu agente a la carpeta de Markdown exportada, nunca a `hepta.db`. Esa separación es el punto central.
+
+### Escenario 1: Asistente de proyecto Claude Code
+
+Estás construyendo una herramienta de trading cuantitativo. Heptabase tiene tres whiteboards: `Investigación de estrategia de trading`, `Notas de diseño del sistema`, y `Registros financieros personales`. Solo añades los dos primeros a `whitelist_whiteboards`, y la herramienta los sincroniza cada 15 minutos a `/projects/trading/heptabase-export/`. Añades esa ruta de carpeta al CLAUDE.md de tu proyecto para que Claude Code la lea como contexto de fondo. El whiteboard de registros financieros nunca está en la allowlist; Claude Code no puede ver siquiera su título.
+
+### Escenario 2: Capa de memoria personal entre herramientas
+
+Las diferentes herramientas de IA no comparten memoria común, lo que te obliga a re-explicar el contexto cada vez que cambias. Sincroniza tus notas de referencia frecuentes, contexto de trabajo y resúmenes de investigación a una carpeta de Markdown, y cualquier herramienta de IA que lea archivos locales retoma donde lo dejaste en segundos. Qué whiteboards entran a la allowlist y cuáles permanecen bloqueados lo decide tu configuración, no confiar en el juicio de la herramienta de IA.
 
 ## Cómo funciona
 

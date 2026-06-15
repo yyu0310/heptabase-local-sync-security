@@ -1,4 +1,4 @@
-# HeptaSieve
+# Heptabase Local Sync Security
 
 **Datenschutz zuerst, KI-sicher. Kontinuierliche lokale Synchronisierung von Heptabase zu strukturiertem Markdown.**
 
@@ -16,13 +16,17 @@ Es begann mit einem einfachen Ziel: Heptabase mit Claude Code verbinden, damit e
 
 Der offizielle Weg ist Heptabases eigenes [CLI](https://github.com/heptameta/heptabase-cli-skills), das Sie in der App unter Settings, AI Features, CLI aktivieren. Es ist **fail-open**: Einmal autorisiert, kann der Agent Ihre gesamte Wissensbasis lesen. Drittanbieter-Tools wie der `heptabase-mcp`-Server funktionieren genauso. Das ist in Ordnung, wenn alles in Ihrer Wissensbasis geteilt werden kann. Aber wenn Sie vertrauliche Karten neben denen haben, die die KI nutzen soll, was die meisten Menschen tun, funktioniert dieser Weg nicht.
 
-Die wesentliche Erkenntnis: Die Datenschutzmauer muss an der Grenze liegen, *was die KI lesen kann*. Diese Grenze liegt außerhalb von Heptabase, in der Art, wie Sie Notizen an den Agenten übergeben. Die eigentliche Aufgabe eines solchen Tools ist daher, **die vertraulichen Karten an einem Ort zu halten, den die KI nicht erreichen kann, und nur den Rest als KI-lesbares Markdown zu exportieren.** Die Notizen zu synchronisieren ist die einfache Hälfte.
+Das Kernproblem: Die Datenschutzmauer muss an der Grenze liegen, *was die KI lesen kann*. Diese Grenze liegt außerhalb von Heptabase, in der Art, wie Sie Notizen an den Agenten übergeben. Die eigentliche Aufgabe eines solchen Tools ist daher, **die vertraulichen Karten an einem Ort zu halten, den die KI nicht erreichen kann, und nur den Rest als KI-lesbares Markdown zu exportieren.** Die Notizen zu synchronisieren ist die einfache Hälfte.
 
-Das ist das Sieve (Sieb). Nur die Karten, die Sie zulassen, kommen durch.
+## Der Name
+
+Der Name gliedert sich in drei Teile, jeder beschreibt etwas anderes. `heptabase` ist die Datenquelle, `local-sync` beschreibt den Mechanismus, und `security` definiert die Rolle.
+
+Security trägt zwei Bedeutungen. Die erste ist Schutz: Das Tool steht zwischen der KI und Ihrer Wissensbasis und nutzt einen fail-closed-Mechanismus, um zu entscheiden, welche Karten in das Sichtfeld der KI gelangen und welche vollständig blockiert werden. Keine Datenlecks, über die man sich Sorgen machen müsste. Die zweite ähnelt eher einer gewissenhaften Sekretärin: Sie organisiert Ihre Notizen still im Hintergrund, synchronisiert automatisch alle 15 Minuten an den konfigurierten Ort, damit Ihre KI-Tools sofort Kontext haben, wenn Sie sie öffnen. Den Eingang bewachen und die Routinearbeit erledigen. Das ist es, was der Name bedeutet.
 
 ## Was es tut
 
-HeptaSieve liest Ihre lokale Heptabase-Datenbank direkt und schreibt ausgewählte Karten als Markdown-Dateien an die von Ihnen gewählten Ziele. Ein `launchd`-Job führt es alle 15 Minuten aus, damit das Markdown mit Ihren Notizen synchron bleibt. Der KI-Agent liest nur den exportierten Markdown-Ordner. Er berührt die Datenbank nie.
+Heptabase Local Sync Security führt ein lokales Python-Skript aus, das Ihre Heptabase-Datenbank direkt liest und ausgewählte Karten als Markdown-Dateien an die von Ihnen gewählten Ziele schreibt. Ein `launchd`-Job führt es alle 15 Minuten aus, damit das Markdown mit Ihren Notizen synchron bleibt. Der KI-Agent liest nur den exportierten Markdown-Ordner. Er berührt die Datenbank nie.
 
 - **Liest die lokale Live-Datenbank.** Heptabase hat Ende 2025 aufgehört, [automatische lokale Backups](https://support.heptabase.com/en/articles/11064116-how-does-auto-backup-work-in-heptabase) anzubieten, daher ist das direkte Lesen der Live-DB nun der zuverlässige Weg für kontinuierliche lokale Synchronisierung.
 - **Strukturtreue Konvertierung.** Tabellen, Bullet / Todo / Toggle-Listen, verschachtelte Abschnitte und Videos werden aus Heptabases ProseMirror-Schema per Reverse Engineering gewonnen und als sauberes Markdown gerendert.
@@ -39,13 +43,13 @@ Eine Karte wird nur exportiert, wenn sie zu einer von zwei expliziten Erlaubnisl
 | **`blacklist_whiteboards`** | Karten auf diesen Boards werden *bevor* Inhalte gelesen werden abgezogen. Die Blacklist schlägt die Whitelist, also wird eine Karte, die versehentlich auf zwei Boards liegt, trotzdem blockiert. |
 | **Sub-Whiteboards (unbenannt)** | Eine Karte in ein Sub-Whiteboard zu verschieben, ändert ihre `whiteboard_id`, sodass ein Oberflächenscan sie nie sieht. Per Struktur ausgeschlossen, nicht durch eine Regel, die Sie sich merken müssen. |
 
-Die Garantie in einem Satz: Jede Abfrage, die den Titel oder Inhalt einer Karte berührt, ist auf Whitelist-Whiteboard-IDs oder `card_map`-Titel beschränkt. Titel und Inhalt einer nicht gelisteten Karte werden nie in den Speicher geladen.
+Noch wichtiger: Jede Abfrage, die den Titel oder Inhalt einer Karte berührt, ist auf Whitelist-Whiteboard-IDs oder `card_map`-Titel beschränkt. Titel und Inhalt einer nicht gelisteten Karte werden nie in den Speicher geladen.
 
-Zwei Designprinzipien folgen daraus. **Struktureller Ausschluss schlägt subtraktiven Ausschluss**: Eine Karte, die die Abfrage nicht erreichen kann, ist sicherer als eine, die nach dem Lesen gefiltert wird. **Die beste Benachrichtigung ist die, die man nie braucht**: Das Tool ist so gebaut, dass Sie sich nie fragen müssen, ob eine Karte geleakt ist.
+Zwei Designprinzipien folgen daraus. **Struktureller Ausschluss schlägt subtraktiven Ausschluss**: Eine Karte, die die Abfrage nicht erreichen kann, ist sicherer als eine, die nach dem Lesen gefiltert wird. Das Tool ist so gebaut, dass Sie sich nie fragen müssen, ob eine Karte geleakt ist, garantiert durch Struktur statt durch nachträgliche Überprüfung.
 
 ## Vergleich
 
-| | HeptaSieve | Offizielles Heptabase CLI | Andere Export-Tools |
+| | Heptabase Local Sync Security | Offizielles Heptabase CLI | Andere Export-Tools |
 |---|---|---|---|
 | Datenschutzmodell | Fail-closed Erlaubnisliste | Fail-open (gesamte Wissensbasis) | Vollständiger Export |
 | Kontinuierliche lokale Sync | Ja (`launchd`, 15 Min.) | Lesen auf Anfrage | Einmaliger Export |
@@ -60,8 +64,8 @@ Dies ist kein vollständiger Ersatz für Heptabase, und "besser als offiziell" g
 Voraussetzungen: macOS, Python 3.9+, die Heptabase-Desktop-App installiert.
 
 ```bash
-git clone https://github.com/yyu0310/heptasieve.git
-cd heptasieve
+git clone https://github.com/yyu0310/heptabase-local-sync-security.git
+cd heptabase-local-sync-security
 cp config.example.json config.json
 ```
 
@@ -94,13 +98,21 @@ launchctl load ~/Library/LaunchAgents/com.example.heptasieve.plist
 
 ## Mit einem KI-Agenten verwenden
 
-HeptaSieve enthält agentenlesbare Dokumente, damit Sie es durch Gespräche mit einem KI-Coding-Agenten einrichten können, anstatt Schritte manuell zu befolgen:
+Dieses Tool enthält agentenlesbare Dokumente, damit Sie es durch Gespräche mit einem KI-Coding-Agenten einrichten können, anstatt Schritte manuell zu befolgen:
 
-- [`AGENTS.md`](AGENTS.md) und [`CLAUDE.md`](CLAUDE.md): wie ein Agent dieses Tool verstehen und konfigurieren sollte.
-- [`llms.txt`](llms.txt): ein Index der Dokumentation für LLMs.
-- [`skills/setup-heptasieve/`](skills/setup-heptasieve/): ein Claude Code Skill, der die gesamte Einrichtung in einer einzigen Anfrage führt.
+- [`AGENTS.md`](AGENTS.md) und [`CLAUDE.md`](CLAUDE.md) sagen dem Agenten, wie er dieses Tool verstehen und konfigurieren soll.
+- [`llms.txt`](llms.txt) ist ein Index der Dokumentation für LLMs.
+- [`skills/setup-heptasieve/`](skills/setup-heptasieve/) ist ein Claude Code Skill, der die gesamte Einrichtung in einer einzigen Anfrage führt.
 
 Richten Sie Ihren Agenten auf den exportierten Markdown-Ordner, nie auf `hepta.db`. Diese Trennung ist der eigentliche Punkt.
+
+### Szenario 1: Claude Code Projektassistent
+
+Sie entwickeln ein quantitatives Trading-Tool. Heptabase hat drei Whiteboards: `Trading-Strategie-Forschung`, `System-Design-Notizen`, und `Persönliche Finanzunterlagen`. Sie fügen nur die ersten zwei zu `whitelist_whiteboards` hinzu, und das Tool synchronisiert sie alle 15 Minuten nach `/projects/trading/heptabase-export/`. Sie fügen diesen Ordnerpfad zur CLAUDE.md Ihres Projekts hinzu, damit Claude Code ihn als Hintergrundkontext liest. Das Whiteboard für Finanzunterlagen ist nie in der Allowlist; Claude Code kann nicht einmal dessen Titel sehen.
+
+### Szenario 2: Persönliche Gedächtnisschicht über Tools hinweg
+
+Verschiedene KI-Tools teilen kein gemeinsames Gedächtnis, was Sie zwingt, bei jedem Wechsel den Kontext neu zu erklären. Synchronisieren Sie Ihre häufig verwendeten Referenznotizen, Arbeitskontext und Forschungszusammenfassungen in einen Markdown-Ordner, und jedes KI-Tool, das lokale Dateien liest, macht dort weiter, wo Sie aufgehört haben, innerhalb von Sekunden. Welche Whiteboards in die Allowlist kommen und welche gesperrt bleiben, entscheidet Ihre Konfiguration, nicht das Vertrauen in das Urteil des KI-Tools.
 
 ## Wie es funktioniert
 

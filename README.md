@@ -1,4 +1,4 @@
-# HeptaSieve
+# Heptabase Local Sync Security
 
 **Privacy-first, AI-safe, continuous local sync from Heptabase to structured Markdown.**
 
@@ -14,15 +14,19 @@ English · [繁體中文](README.zh-TW.md) · [简体中文](README.zh-CN.md) ·
 
 It started with a simple goal: connect Heptabase to Claude Code so an AI agent could read my notes.
 
-The official route is Heptabase's own [CLI](https://github.com/heptameta/heptabase-cli-skills), which you turn on in the app under Settings, AI Features, CLI. It is **fail-open**: once you authorize it, the agent can read your entire knowledge base. Third-party tools like the `heptabase-mcp` server work the same way. That is fine if everything in your knowledge base is safe to share. It does not work if you keep confidential cards next to the ones you want an AI to use, which most people do.
+The official route is Heptabase's own [CLI](https://github.com/heptameta/heptabase-cli-skills), enabled in the app under Settings, AI Features, CLI. It uses a **fail-open** mechanism: once you authorize it, the agent can read your entire knowledge base. Third-party tools like the `heptabase-mcp` server work the same way. That is fine if every card in your knowledge base is safe to share. It does not work if you keep confidential cards next to the ones you want an AI to use, which most people do.
 
-The real insight: the privacy wall has to sit at the boundary of *what the AI can read*. That boundary lives outside Heptabase, in how you feed notes to the agent. So the real job of a tool like this is **to keep the confidential cards somewhere the AI cannot reach, and export only the rest into AI-readable Markdown.** Syncing the notes is the easy half.
+The core issue is that the privacy wall has to sit at the boundary of *what the AI can read*, and that boundary lives outside Heptabase, in how you feed notes to the agent. The real job of a tool like this is **to keep the confidential cards somewhere the AI cannot reach, and export only the rest into AI-readable Markdown.** Syncing the notes is the easy half.
 
-That is the sieve. Only the cards you allow pass through.
+## The name
+
+The name breaks into three parts, each describing something different. `heptabase` is the data source, `local-sync` describes the mechanism, and `security` defines the role.
+
+Security carries two meanings. The first is protection: the tool stands between the AI and your knowledge base, using a fail-closed mechanism to decide which cards enter the AI's field of view and which are blocked entirely. No data leaks to worry about. The second is closer to a diligent secretary: it quietly organizes your notes in the background, auto-syncing every 15 minutes to wherever you configured, so your AI tools have context ready the moment you open them. Guard the gate and handle the grunt work. That is what the name means.
 
 ## What it does
 
-HeptaSieve reads your local Heptabase database directly and writes selected cards as Markdown files at destinations you choose. A `launchd` job runs it every 15 minutes, so the Markdown stays in step with your notes. The AI agent only ever reads the exported Markdown folder. It never touches the database.
+Heptabase Local Sync Security runs a local Python script that reads your Heptabase database directly and writes selected cards as Markdown files at destinations you choose. A `launchd` job runs it every 15 minutes, so the Markdown stays in step with your notes. The AI agent only ever reads the exported Markdown folder and never touches the database.
 
 - **Reads the live local database.** Heptabase stopped offering [automatic local backups](https://support.heptabase.com/en/articles/11064116-how-does-auto-backup-work-in-heptabase) in late 2025, so reading the live DB is now the reliable path to continuous local sync.
 - **Structure-faithful conversion.** Tables, bullet / todo / toggle lists, nested sections, and videos are reverse-engineered from Heptabase's ProseMirror schema and rendered as clean Markdown.
@@ -39,13 +43,13 @@ A card is exported only if it matches one of two explicit allow-lists. Nothing i
 | **`blacklist_whiteboards`** | Cards on these boards are subtracted *before* any content is read. Blacklist beats whitelist, so a card placed on two boards by mistake is still blocked. |
 | **Sub-whiteboards (un-named)** | Moving a card into a sub-whiteboard changes its `whiteboard_id`, so a surface scan never sees it. Excluded by structure, not by a rule you have to remember. |
 
-The guarantee in one line: every query that touches a card's title or content is constrained to whitelisted whiteboard ids or `card_map` titles. A non-whitelisted card's title and content are never read into memory at all.
+More importantly, every query that touches a card's title or content is constrained to whitelisted whiteboard ids or `card_map` titles. A non-whitelisted card's title and content are never read into memory at all.
 
-Two design principles fall out of this. **Structural exclusion beats subtractive exclusion**: a card the query can't reach is safer than a card you filtered out after reading. And **the best notification is the one you never need**: the tool is built so you never have to wonder whether a card leaked.
+Two design principles follow from this. **Structural exclusion beats subtractive exclusion**, meaning a card the query cannot reach is safer than one filtered out after reading. The tool is built so you never have to wonder whether a card leaked, guaranteed by structure rather than by checking after the fact.
 
 ## How it compares
 
-| | HeptaSieve | Official Heptabase CLI | Other export tools |
+| | Heptabase Local Sync Security | Official Heptabase CLI | Other export tools |
 |---|---|---|---|
 | Privacy model | Fail-closed allow-list | Fail-open (full knowledge base) | Full export |
 | Continuous local sync | Yes (`launchd`, 15 min) | Read on request | One-shot export |
@@ -53,15 +57,15 @@ Two design principles fall out of this. **Structural exclusion beats subtractive
 | Structure-faithful Markdown | Tables, lists, sections, video | Varies | Varies |
 | Per-board destination routing | Yes, incl. absolute paths | No | No |
 
-This is not a full replacement for Heptabase, and "better than official" only holds on three axes: controllable privacy, continuous local sync, and structure fidelity. The audience is intentionally narrow: macOS users who live in Heptabase and care about what an AI can see. If that is you, this is built for exactly your case.
+This is not a full replacement for Heptabase. "Better than official" holds on three axes only: controllable privacy, continuous local sync, and structure fidelity. The audience is intentionally narrow: macOS users who live in Heptabase and care about what an AI can see. If that is you, this is built for exactly your case.
 
 ## Install
 
 Requirements: macOS, Python 3.9+, the Heptabase desktop app installed.
 
 ```bash
-git clone https://github.com/yyu0310/heptasieve.git
-cd heptasieve
+git clone https://github.com/yyu0310/heptabase-local-sync-security.git
+cd heptabase-local-sync-security
 cp config.example.json config.json
 ```
 
@@ -94,17 +98,25 @@ launchctl load ~/Library/LaunchAgents/com.example.heptasieve.plist
 
 ## Using it with an AI agent
 
-HeptaSieve ships agent-readable docs so you can set it up by talking to an AI coding agent instead of following steps by hand:
+This tool ships with agent-readable docs so you can set it up by talking to an AI coding agent instead of following steps by hand:
 
-- [`AGENTS.md`](AGENTS.md) and [`CLAUDE.md`](CLAUDE.md): how an agent should reason about and configure this tool.
-- [`llms.txt`](llms.txt): an index of the docs for LLMs.
-- [`skills/setup-heptasieve/`](skills/setup-heptasieve/): a Claude Code skill that walks the whole setup in one request.
+- [`AGENTS.md`](AGENTS.md) and [`CLAUDE.md`](CLAUDE.md) tell the agent how to understand and configure this tool.
+- [`llms.txt`](llms.txt) is a documentation index for LLMs.
+- [`skills/setup-heptasieve/`](skills/setup-heptasieve/) is a Claude Code skill that walks the whole setup in one request.
 
 Point your agent at the exported Markdown folder, never at `hepta.db`. That separation is the entire point.
 
+### Scenario 1: Claude Code project assistant
+
+You are building a quantitative trading tool. Heptabase has three whiteboards: `Trading Strategy Research`, `System Design Notes`, and `Personal Financial Records`. You add only the first two to `whitelist_whiteboards`, and the tool syncs them every 15 minutes to `/projects/trading/heptabase-export/`. You add that folder path to your project's CLAUDE.md so Claude Code reads it as background context. The financial records whiteboard is never in the allowlist; Claude Code cannot see even its title.
+
+### Scenario 2: Cross-tool personal memory layer
+
+Different AI tools share no common memory, forcing you to re-explain context every time you switch. Sync your frequently used reference notes, work context, and research summaries to a Markdown folder, and any AI tool that reads local files picks up where you left off in seconds. Which whiteboards enter the allowlist and which stay locked is decided by your config, not by trusting the AI tool's judgment.
+
 ## How it works
 
-See [`ARCHITECTURE.md`](ARCHITECTURE.md) for the architecture: the data flow, the fail-closed ordering inside `build_plan`, the database tables it reads, and the privacy invariants to preserve when modifying the code.
+See [`ARCHITECTURE.md`](ARCHITECTURE.md) for architecture details, including the data flow, the fail-closed ordering inside `build_plan`, the database tables it reads, and the privacy invariants to preserve when modifying the code.
 
 ## Limitations and honest caveats
 
