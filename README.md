@@ -30,7 +30,7 @@ Heptabase Local Sync Security runs a local Python script that reads your Heptaba
 
 - **Reads the live local database.** Heptabase stopped offering [automatic local backups](https://support.heptabase.com/en/articles/11064116-how-does-auto-backup-work-in-heptabase) in late 2025, so reading the live DB is now the reliable path to continuous local sync.
 - **Structure-faithful conversion.** Tables, bullet / todo / toggle lists, nested sections, and videos are reverse-engineered from Heptabase's ProseMirror schema and rendered as clean Markdown.
-- **Any-destination routing.** Each whiteboard can land in its own folder, including an absolute path that drops a board straight into a separate project.
+- **Any-destination routing.** Each whiteboard can land in its own folder, including an absolute path that drops a board straight into a separate project. You can collaborate with an AI agent to decide which local path Python should point to.
 
 ## The fail-closed privacy model
 

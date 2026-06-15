@@ -30,7 +30,7 @@ Heptabase Local Sync Security đọc trực tiếp cơ sở dữ liệu Heptabas
 
 - **Đọc trực tiếp cơ sở dữ liệu cục bộ đang hoạt động.** Heptabase ngừng cung cấp [bản sao lưu cục bộ tự động](https://support.heptabase.com/en/articles/11064116-how-does-auto-backup-work-in-heptabase) vào cuối năm 2025, nên đọc trực tiếp DB đang chạy là con đường đáng tin cậy để đồng bộ liên tục.
 - **Chuyển đổi trung thực với cấu trúc.** Bảng, danh sách bullet / todo / toggle, các section lồng nhau và video được phân tích ngược từ schema ProseMirror của Heptabase và xuất ra Markdown sạch.
-- **Định tuyến đến bất kỳ đích nào.** Mỗi whiteboard có thể lưu vào thư mục riêng, kể cả dùng đường dẫn tuyệt đối để đặt một board thẳng vào dự án khác.
+- **Định tuyến đến bất kỳ đích nào.** Mỗi whiteboard có thể lưu vào thư mục riêng, kể cả dùng đường dẫn tuyệt đối để đặt một board thẳng vào dự án khác. Bạn có thể phối hợp với AI agent để quyết định Python sẽ trỏ đến đường dẫn cục bộ nào.
 
 ## Mô hình bảo mật fail-closed
 

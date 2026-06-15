@@ -14,13 +14,13 @@
 
 一开始的目标很单纯：把 Heptabase 接上 Claude Code，让 AI agent 读我的笔记。
 
-官方路径是 Heptabase 自家的 [CLI](https://github.com/heptameta/heptabase-cli-skills)（在 app 内 Settings、AI Features、CLI 开启），采 **fail-open** 机制，一旦授权，agent 就能读你整个知识库。第三方工具如 `heptabase-mcp` server 也是同样机制。如果你的知识库每张卡片都能公开就没问题，但只要你像多数人一样，把机密卡片和想给 AI 用的卡片放在一起，这就不可行。
+官方路径是 Heptabase 自家的 [CLI](https://github.com/heptameta/heptabase-cli-skills) 采 **fail-open** 机制，一旦授权，agent 就能读你整个知识库，第三方工具如 `heptabase-mcp` server 也是同样机制。如果你的知识库每张卡片都能公开就没问题，但只要你像多数人一样，把机密卡片和想给 AI 用的卡片放在一起，这就不可行。
 
 问题的核心在于，隐私墙必须立在「AI 能读到什么」这条边界上，而这条边界落在 Heptabase 之外，在你怎么把笔记喂给 AI 的那一层。所以这类工具真正要做的，是**把机密卡片留在 AI 碰不到的地方，只把其余卡片导出成 AI 可读的 Markdown**。同步笔记只是简单的那一半。
 
 ## 命名由来
 
-名字拆成三段各说一件事。`heptabase` 是数据来源，`local-sync` 说明它的机制，`security` 说明它的角色。
+名字拆成三段，各说一件事，`heptabase` 是数据来源，`local-sync` 说明它的机制，`security` 说明它的角色。
 
 Security 同时带着两层含义。第一层是安全：工具守在 AI 和你的知识库之间，用 fail-closed 机制决定哪些卡片能进 AI 的视野、哪些一律挡在外面，不用担心数据外泄。第二层更像一个尽责的秘书：主动在后台把笔记整理好，按你设定的位置每 15 分钟自动同步，让你打开 AI 工具就直接有内容可用，不必再手动管这件事。守门加庶务，这就是它名字的意思。
 
@@ -30,7 +30,7 @@ Heptabase Local Sync Security 中本地运作的 Python 程序直接读你本地
 
 - **直读 live 本地数据库。** Heptabase 在 2025 年底停止提供[自动本地备份](https://support.heptabase.com/en/articles/11064116-how-does-auto-backup-work-in-heptabase)，直读 live DB 因此成为持续本地同步的可靠路径。
 - **结构保真转换。** 表格、bullet／todo／toggle 列表、嵌套 section、视频，都是从 Heptabase 的 ProseMirror schema 逆向出来，转成干净 Markdown。
-- **任意目的地路由。** 每张白板都能落到自己的文件夹，包含用绝对路径把某张白板直接放进另一个项目。
+- **任意目的地路由。** 每张白板都能落到自己的文件夹，包含用绝对路径把某张白板直接放进另一个项目，可以通过 AI Agent 协作，决定 python 要指向你本地的哪个位置。
 
 ## fail-closed 隐私模型
 

@@ -30,7 +30,7 @@ Heptabase Local Sync Security führt ein lokales Python-Skript aus, das Ihre Hep
 
 - **Liest die lokale Live-Datenbank.** Heptabase hat Ende 2025 aufgehört, [automatische lokale Backups](https://support.heptabase.com/en/articles/11064116-how-does-auto-backup-work-in-heptabase) anzubieten, daher ist das direkte Lesen der Live-DB nun der zuverlässige Weg für kontinuierliche lokale Synchronisierung.
 - **Strukturtreue Konvertierung.** Tabellen, Bullet / Todo / Toggle-Listen, verschachtelte Abschnitte und Videos werden aus Heptabases ProseMirror-Schema per Reverse Engineering gewonnen und als sauberes Markdown gerendert.
-- **Beliebiges Ziel-Routing.** Jedes Whiteboard kann in seinen eigenen Ordner gelangen, einschließlich eines absoluten Pfads, der ein Board direkt in ein separates Projekt legt.
+- **Beliebiges Ziel-Routing.** Jedes Whiteboard kann in seinen eigenen Ordner gelangen, einschließlich eines absoluten Pfads, der ein Board direkt in ein separates Projekt legt. Sie können mit einem KI-Agenten zusammenarbeiten, um zu entscheiden, auf welchen lokalen Pfad Python zeigen soll.
 
 ## Das fail-closed Datenschutzmodell
 

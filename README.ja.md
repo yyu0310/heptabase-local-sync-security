@@ -30,7 +30,7 @@ Heptabase Local Sync Security はローカルの Heptabase データベースを
 
 - **ライブのローカル DB を直読み。** Heptabase は 2025 年末に[自動ローカルバックアップ](https://support.heptabase.com/en/articles/11064116-how-does-auto-backup-work-in-heptabase)の提供を終了したため、ライブ DB の直読みが継続的なローカル同期の確実な手段になりました。
 - **構造を保った変換。** 表、bullet／todo／toggle リスト、ネストした section、動画を、Heptabase の ProseMirror スキーマからリバースエンジニアリングし、きれいな Markdown へ変換します。
-- **任意の宛先へのルーティング。** 各ホワイトボードを個別のフォルダへ落とせます。絶対パスを使えば、特定のボードを別プロジェクトへ直接配置することも可能です。
+- **任意の宛先へのルーティング。** 各ホワイトボードを個別のフォルダへ落とせます。絶対パスを使えば、特定のボードを別プロジェクトへ直接配置することも可能です。AI エージェントと協力して、Python の向き先となるローカルパスを決めることもできます。
 
 ## fail-closed プライバシーモデル
 
